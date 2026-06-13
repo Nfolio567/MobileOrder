@@ -1,0 +1,22 @@
+<mxfile host="Electron">
+  <diagram name="ページ-1" id="q72MlsLIhgidqwDHlQGh">
+    <mxGraphModel dx="1558" dy="632" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="dL5f8zYh1LEznC7oVJyu-5" parent="1" style="swimlane;startSize=30;fontSize=20;" value="Inner API" vertex="1">
+          <mxGeometry height="270" width="270" x="-683" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="dL5f8zYh1LEznC7oVJyu-2" parent="dL5f8zYh1LEznC7oVJyu-5" style="rounded=0;whiteSpace=wrap;html=1;fontSize=30;fillColor=#6a00ff;strokeColor=#3700CC;fontColor=#ffffff;" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Directus&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="70" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="dL5f8zYh1LEznC7oVJyu-3" parent="dL5f8zYh1LEznC7oVJyu-5" style="rounded=0;whiteSpace=wrap;html=1;fontSize=30;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;PostgreSQL&lt;/font&gt;" vertex="1">
+          <mxGeometry height="90" width="180" x="50" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="dL5f8zYh1LEznC7oVJyu-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#8C008C,#8C008C);strokeColor=#b85450;gradientColor=none;fillStyle=auto;fontSize=30;" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Ktor&lt;/font&gt;" vertex="1">
+          <mxGeometry height="40" width="100" x="-60" y="470" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,5 @@
+.gradle/
+.idea/
+compose.ymal
+.env
+src/main/resources/application-dev.yaml
