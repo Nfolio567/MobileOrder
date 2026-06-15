@@ -13,5 +13,5 @@ fun Application.module() {
   configureWebsockets()
   configureSerialization()
   val client = configureClient()
-  configureRouting(ConnectDirectus(client))
+  configureRouting(ConnectDirectus(client, environment))
 }

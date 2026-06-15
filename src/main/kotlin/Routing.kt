@@ -1,18 +1,13 @@
 package one.nfolio
 
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation;
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.serialization.kotlinx.json.json
+import dto.receive.OrderRequest
 import io.ktor.server.application.*
+import io.ktor.server.request.receive
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import one.nfolio.JSON.RawProducts
+import kotlin.collections.mapOf
 
 fun Application.configureRouting(directus: ConnectDirectus) {
   routing {
@@ -32,10 +27,24 @@ fun Application.configureRouting(directus: ConnectDirectus) {
     }
 
     get("/api/get/products") {
-      directus.getProducts(environment)
+      call.respond(mapOf(
+        "products" to directus.getProducts()
+      ))
     }
 
-    get("/json/kotlinx-serialization") {
+    get("/api/get/options") {
+      call.respond(mapOf(
+        "options" to directus.getOptions()
+      ))
+    }
+
+    post("/api/post/order") {
+      val res = call.receive<OrderRequest>()
+
+      directus.registeringOrder(res)
+    }
+
+    get("/dto/kotlinx-serialization") {
       call.respond(mapOf("hello" to "world"))
     }
   }
