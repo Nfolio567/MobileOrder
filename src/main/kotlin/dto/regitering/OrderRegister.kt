@@ -1,3 +1,3 @@
 package dto.regitering
 
-data class OrderRegister(val linePrimaryID: String)
+data class OrderRegister(val linePrimaryID: String, val fakeOrderID: String )

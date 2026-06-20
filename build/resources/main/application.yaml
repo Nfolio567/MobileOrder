@@ -1,0 +1,9 @@
+ktor:
+  deployment:
+    port: 8080
+  application:
+    modules:
+      - one.nfolio.MainKt.module
+
+directus:
+  access-token: xxxxxxxxxxxxxxxxxxxxxxxx

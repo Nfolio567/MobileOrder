@@ -14,7 +14,7 @@ application {
 }
 
 kotlin {
-  jvmToolchain(21)
+  jvmToolchain(25)
 }
 dependencies {
   implementation(ktorLibs.serialization.kotlinx.json)
@@ -29,6 +29,8 @@ dependencies {
   implementation(libs.ktor.client)
   implementation(libs.ktor.client.cio)
   implementation(libs.ktor.client.content.negotiation)
+  implementation("io.ktor:ktor-server-auth:3.5.0")
+  implementation("io.ktor:ktor-server-sessions:3.5.0")
 
   testImplementation(kotlin("test"))
   testImplementation(ktorLibs.server.testHost)

@@ -1,0 +1,14 @@
+ktor:
+  deployment:
+    port: 8080
+  application:
+    modules:
+      - one.nfolio.MainKt.module
+
+directus:
+  host: localhost
+  port: 8055
+  access-token: BORNicb2WdBqnrtpWd1-E2bV6MZEiB2k
+
+HMAC:
+  secret-key: CIEH938jsodWnc-au3iqn9NCNS9kaas
