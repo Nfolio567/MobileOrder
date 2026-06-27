@@ -1,5 +1,8 @@
 package one.nfolio.dto.line
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class VerifyToken(
   val iss: String,
   val sub: String,

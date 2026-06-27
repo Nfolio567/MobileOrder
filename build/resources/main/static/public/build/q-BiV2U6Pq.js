@@ -1,0 +1,2 @@
+import{l as t}from"./q-D_o0LJax.js";import{x as c}from"./q-Dz0wz8Gq.js";const r=async()=>{try{const e=await(await fetch("/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:t.getIDToken()})})).json();e.title?console.error(`%c${e.title}%c
+%c${e.description}`,"font-size: 15px;","","font-size: medium;",""):e.redirect&&(window.location.href=e.redirect)}catch(o){console.error(o)}};export{c as _hW,r as s_g8hgguUEJf0};

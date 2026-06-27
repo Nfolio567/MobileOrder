@@ -3,3 +3,7 @@
 compose.ymal
 .env
 src/main/resources/application-dev.yaml
+normalize-static-files.sh
+
+src/main/resources/static/private/
+src/main/resources/static/public/

@@ -1,3 +1,6 @@
 package one.nfolio.dto.receive
 
-data class UserLogin(val token: String)
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class UserLogin(val token: String?)

@@ -1,0 +1,1 @@
+import{v as s}from"./q-Dz0wz8Gq.js";import{x as r}from"./q-Dz0wz8Gq.js";const a=async()=>{const[o]=s();console.log("/");const e=await(await fetch("/api/get/recommended")).json();o.value=(e==null?void 0:e.message)??""};export{r as _hW,a as s_0hGdVutamcA};

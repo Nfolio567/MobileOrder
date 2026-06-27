@@ -4,6 +4,7 @@ ktor:
   application:
     modules:
       - one.nfolio.MainKt.module
+    route-path: /
 
 directus:
   access-token: xxxxxxxxxxxxxxxxxxxxxxxx

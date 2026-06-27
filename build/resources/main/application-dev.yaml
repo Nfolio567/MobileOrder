@@ -4,6 +4,7 @@ ktor:
   application:
     modules:
       - one.nfolio.MainKt.module
+    route-path: https://mac.nfolio.one/
 
 directus:
   host: localhost
@@ -12,3 +13,6 @@ directus:
 
 HMAC:
   secret-key: CIEH938jsodWnc-au3iqn9NCNS9kaas
+
+LIFF:
+  id: 2010422599

@@ -12,7 +12,12 @@ fun Application.configureHttp() {
     allowMethod(HttpMethod.Delete)
     allowMethod(HttpMethod.Patch)
     allowHeader(HttpHeaders.Authorization)
-    allowHeader("MyCustomHeader")
-    anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
+    allowHeader(HttpHeaders.ContentType)
+    allowHeader(HttpHeaders.Origin)
+    allowHeader(HttpHeaders.Host)
+    allowHost("mac.nfolio.one")
+
+    allowCredentials = true
+    //anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
   }
 }

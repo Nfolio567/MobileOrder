@@ -1,0 +1,340 @@
+{
+	"version": "1",
+	"manifestHash": "nbacy6",
+	"options": {
+		"target": "client",
+		"buildMode": "production",
+		"entryStrategy": {
+			"type": "smart"
+		}
+	},
+	"core": "q-Dz0wz8Gq.js",
+	"preloader": "q-BMNM21mH.js",
+	"bundleGraphAsset": "assets/BkHonpCM-bundle-graph.json",
+	"injections": [],
+	"mapping": {
+		"s_0hGdVutamcA": "q-DTxhBe6M.js",
+		"s_QkC8rfaCt4g": "q-BDLeJqtC.js",
+		"s_0hhpT5PeCFg": "q-Dul4xgmg.js",
+		"s_3VRuAW0Q7rU": "q-DIPHEo9U.js",
+		"s_Yuvg4rO9WE4": "q-ntsrgahg.js",
+		"s_g8hgguUEJf0": "q-BiV2U6Pq.js"
+	},
+	"bundles": {
+		"q-B4Ob8kfB.js": {
+			"size": 236,
+			"total": 47743,
+			"imports": [
+				"q-Dz0wz8Gq.js"
+			],
+			"dynamicImports": [
+				"q-BiV2U6Pq.js",
+				"q-Dul4xgmg.js"
+			],
+			"origins": [
+				"src/components/Login.tsx"
+			],
+			"interactivity": 0
+		},
+		"q-BDLeJqtC.js": {
+			"size": 480,
+			"total": 220692,
+			"imports": [
+				"q-B4Ob8kfB.js",
+				"q-D_o0LJax.js",
+				"q-Dz0wz8Gq.js"
+			],
+			"origins": [
+				"src/components/Login.tsx_Login_component_useVisibleTask_QkC8rfaCt4g.js"
+			],
+			"symbols": [
+				"s_QkC8rfaCt4g"
+			],
+			"interactivity": 3
+		},
+		"q-BiV2U6Pq.js": {
+			"size": 458,
+			"total": 172927,
+			"imports": [
+				"q-D_o0LJax.js",
+				"q-Dz0wz8Gq.js"
+			],
+			"origins": [
+				"src/components/Login.tsx_login_g8hgguUEJf0.js"
+			],
+			"symbols": [
+				"s_g8hgguUEJf0"
+			],
+			"interactivity": 1
+		},
+		"q-BMNM21mH.js": {
+			"size": 3782,
+			"total": 3782,
+			"origins": [
+				"@builder.io/qwik/build",
+				"node_modules/.pnpm/@builder.io+qwik@1.20.0_vite@6.4.3_@types+node@24.13.2_jiti@2.7.0_lightningcss@1.32.0_yaml@2.9.0_/node_modules/@builder.io/qwik/dist/preloader.mjs"
+			],
+			"interactivity": 0
+		},
+		"q-D_o0LJax.js": {
+			"size": 124962,
+			"total": 124962,
+			"origins": [
+				"node_modules/.pnpm/@liff+activity@2.29.0_tslib@2.8.1/node_modules/@liff/activity/lib/index.es.js",
+				"node_modules/.pnpm/@liff+analytics@2.29.0_tslib@2.8.1/node_modules/@liff/analytics/lib/index.es.js",
+				"node_modules/.pnpm/@liff+check-availability@2.29.0_tslib@2.8.1/node_modules/@liff/check-availability/lib/index.es.js",
+				"node_modules/.pnpm/@liff+close-window@2.29.0_tslib@2.8.1/node_modules/@liff/close-window/lib/index.es.js",
+				"node_modules/.pnpm/@liff+consts@2.29.0_tslib@2.8.1/node_modules/@liff/consts/lib/index.es.js",
+				"node_modules/.pnpm/@liff+create-shortcut-on-home-screen@2.29.0_tslib@2.8.1/node_modules/@liff/create-shortcut-on-home-screen/lib/index.es.js",
+				"node_modules/.pnpm/@liff+extensions@2.29.0_tslib@2.8.1/node_modules/@liff/extensions/lib/es/index.js",
+				"node_modules/.pnpm/@liff+get-app-language@2.29.0_tslib@2.8.1/node_modules/@liff/get-app-language/lib/index.es.js",
+				"node_modules/.pnpm/@liff+get-friendship@2.29.0_tslib@2.8.1/node_modules/@liff/get-friendship/lib/index.es.js",
+				"node_modules/.pnpm/@liff+get-language@2.29.0_tslib@2.8.1/node_modules/@liff/get-language/lib/index.es.js",
+				"node_modules/.pnpm/@liff+get-line-version@2.29.0_tslib@2.8.1/node_modules/@liff/get-line-version/lib/index.es.js",
+				"node_modules/.pnpm/@liff+get-origins@2.29.0_tslib@2.8.1/node_modules/@liff/get-origins/lib/index.es.js",
+				"node_modules/.pnpm/@liff+get-os@2.29.0_tslib@2.8.1/node_modules/@liff/get-os/lib/index.es.js",
+				"node_modules/.pnpm/@liff+get-profile@2.29.0_tslib@2.8.1/node_modules/@liff/get-profile/lib/index.es.js",
+				"node_modules/.pnpm/@liff+get-version@2.29.0_tslib@2.8.1/node_modules/@liff/get-version/lib/index.es.js",
+				"node_modules/.pnpm/@liff+hooks@2.29.0_tslib@2.8.1/node_modules/@liff/hooks/lib/index.es.js",
+				"node_modules/.pnpm/@liff+i18n@2.29.0_tslib@2.8.1/node_modules/@liff/i18n/lib/index.es.js",
+				"node_modules/.pnpm/@liff+iap@2.29.0_tslib@2.8.1/node_modules/@liff/iap/lib/index.es.js",
+				"node_modules/.pnpm/@liff+init@2.29.0_tslib@2.8.1/node_modules/@liff/init/lib/index.es.js",
+				"node_modules/.pnpm/@liff+is-api-available@2.29.0_tslib@2.8.1/node_modules/@liff/is-api-available/lib/index.es.js",
+				"node_modules/.pnpm/@liff+is-in-client@2.29.0_tslib@2.8.1/node_modules/@liff/is-in-client/lib/index.es.js",
+				"node_modules/.pnpm/@liff+is-logged-in@2.29.0_tslib@2.8.1/node_modules/@liff/is-logged-in/lib/index.es.js",
+				"node_modules/.pnpm/@liff+is-sub-window@2.29.0_tslib@2.8.1/node_modules/@liff/is-sub-window/lib/index.es.js",
+				"node_modules/.pnpm/@liff+logger@2.29.0_tslib@2.8.1/node_modules/@liff/logger/lib/index.es.js",
+				"node_modules/.pnpm/@liff+login@2.29.0_tslib@2.8.1/node_modules/@liff/login/lib/index.es.js",
+				"node_modules/.pnpm/@liff+logout@2.29.0_tslib@2.8.1/node_modules/@liff/logout/lib/index.es.js",
+				"node_modules/.pnpm/@liff+message-bus@2.29.0_tslib@2.8.1/node_modules/@liff/message-bus/lib/index.es.js",
+				"node_modules/.pnpm/@liff+native-bridge@2.29.0_tslib@2.8.1/node_modules/@liff/native-bridge/lib/index.es.js",
+				"node_modules/.pnpm/@liff+open-window@2.29.0_tslib@2.8.1/node_modules/@liff/open-window/lib/index.es.js",
+				"node_modules/.pnpm/@liff+permanent-link@2.29.0_tslib@2.8.1/node_modules/@liff/permanent-link/lib/index.es.js",
+				"node_modules/.pnpm/@liff+permission@2.29.0_tslib@2.8.1/node_modules/@liff/permission/lib/index.es.js",
+				"node_modules/.pnpm/@liff+ready@2.29.0_tslib@2.8.1/node_modules/@liff/ready/lib/index.es.js",
+				"node_modules/.pnpm/@liff+request-friendship@2.29.0_tslib@2.8.1/node_modules/@liff/request-friendship/lib/index.es.js",
+				"node_modules/.pnpm/@liff+scan-code-v2@2.29.0_tslib@2.8.1/node_modules/@liff/scan-code-v2/lib/index.es.js",
+				"node_modules/.pnpm/@liff+send-messages@2.29.0_tslib@2.8.1/node_modules/@liff/send-messages/lib/index.es.js",
+				"node_modules/.pnpm/@liff+server-api@2.29.0_tslib@2.8.1/node_modules/@liff/server-api/lib/index.es.js",
+				"node_modules/.pnpm/@liff+share-target-picker@2.29.0_tslib@2.8.1/node_modules/@liff/share-target-picker/lib/index.es.js",
+				"node_modules/.pnpm/@liff+store@2.29.0_tslib@2.8.1/node_modules/@liff/store/lib/index.es.js",
+				"node_modules/.pnpm/@liff+sub-window@2.29.0_tslib@2.8.1/node_modules/@liff/sub-window/lib/index.es.js",
+				"node_modules/.pnpm/@liff+use@2.29.0_tslib@2.8.1/node_modules/@liff/use/lib/index.es.js",
+				"node_modules/.pnpm/@liff+util@2.29.0_tslib@2.8.1/node_modules/@liff/util/lib/index.es.js",
+				"node_modules/.pnpm/@liff+verify-id-token@2.29.0_tslib@2.8.1/node_modules/@liff/verify-id-token/lib/index.es.js",
+				"node_modules/.pnpm/@liff+window-postmessage@2.29.0_tslib@2.8.1/node_modules/@liff/window-postmessage/lib/index.es.js",
+				"node_modules/.pnpm/@line+liff@2.29.0/node_modules/@line/liff/index.mjs",
+				"node_modules/.pnpm/tiny-sha256@1.0.2/node_modules/tiny-sha256/index.js",
+				"node_modules/.pnpm/tslib@2.8.1/node_modules/tslib/tslib.es6.mjs",
+				"node_modules/.pnpm/whatwg-fetch@3.6.20/node_modules/whatwg-fetch/fetch.js"
+			],
+			"interactivity": 0
+		},
+		"q-DIPHEo9U.js": {
+			"size": 129,
+			"total": 47636,
+			"imports": [
+				"q-Dz0wz8Gq.js"
+			],
+			"origins": [
+				"node_modules/.pnpm/@qwikdev+astro@0.8.3_@builder.io+qwik@1.20.0_vite@6.4.3_@types+node@24.13.2_jiti@2.7.0__c05a1fc1ad0de9ba0d01fbf43cb10dbc/node_modules/@qwikdev/astro/src/root.tsx_root_component_3VRuAW0Q7rU.js"
+			],
+			"symbols": [
+				"s_3VRuAW0Q7rU"
+			],
+			"interactivity": 2
+		},
+		"q-DTxhBe6M.js": {
+			"size": 255,
+			"total": 47762,
+			"imports": [
+				"q-Dz0wz8Gq.js"
+			],
+			"origins": [
+				"src/components/Recommended.tsx_Recommended_component_useVisibleTask_0hGdVutamcA.js"
+			],
+			"symbols": [
+				"s_0hGdVutamcA"
+			],
+			"interactivity": 3
+		},
+		"q-Dul4xgmg.js": {
+			"size": 363,
+			"total": 47870,
+			"imports": [
+				"q-Dz0wz8Gq.js"
+			],
+			"dynamicImports": [
+				"q-BDLeJqtC.js"
+			],
+			"origins": [
+				"src/components/Login.tsx_Login_component_0hhpT5PeCFg.js"
+			],
+			"symbols": [
+				"s_0hhpT5PeCFg"
+			],
+			"interactivity": 2
+		},
+		"q-Dz0wz8Gq.js": {
+			"size": 47507,
+			"total": 47507,
+			"origins": [
+				"node_modules/.pnpm/@builder.io+qwik@1.20.0_vite@6.4.3_@types+node@24.13.2_jiti@2.7.0_lightningcss@1.32.0_yaml@2.9.0_/node_modules/@builder.io/qwik/dist/core.min.mjs"
+			],
+			"interactivity": 0
+		},
+		"q-ljCJHOlK.js": {
+			"size": 171,
+			"total": 47678,
+			"imports": [
+				"q-Dz0wz8Gq.js"
+			],
+			"dynamicImports": [
+				"q-DIPHEo9U.js"
+			],
+			"origins": [
+				"node_modules/.pnpm/@qwikdev+astro@0.8.3_@builder.io+qwik@1.20.0_vite@6.4.3_@types+node@24.13.2_jiti@2.7.0__c05a1fc1ad0de9ba0d01fbf43cb10dbc/node_modules/@qwikdev/astro/src/root.tsx"
+			],
+			"interactivity": 0
+		},
+		"q-naDMFAHy.js": {
+			"size": 3100,
+			"total": 3100,
+			"origins": [
+				"node_modules/.pnpm/@builder.io+qwik@1.20.0_vite@6.4.3_@types+node@24.13.2_jiti@2.7.0_lightningcss@1.32.0_yaml@2.9.0_/node_modules/@builder.io/qwik/dist/qwikloader.js"
+			],
+			"interactivity": 0
+		},
+		"q-ntsrgahg.js": {
+			"size": 294,
+			"total": 47801,
+			"imports": [
+				"q-Dz0wz8Gq.js"
+			],
+			"dynamicImports": [
+				"q-DTxhBe6M.js"
+			],
+			"origins": [
+				"src/components/Recommended.tsx_Recommended_component_Yuvg4rO9WE4.js"
+			],
+			"symbols": [
+				"s_Yuvg4rO9WE4"
+			],
+			"interactivity": 2
+		},
+		"q-ZUbPpYne.js": {
+			"size": 175,
+			"total": 47682,
+			"imports": [
+				"q-Dz0wz8Gq.js"
+			],
+			"dynamicImports": [
+				"q-ntsrgahg.js"
+			],
+			"origins": [
+				"src/components/Recommended.tsx"
+			],
+			"interactivity": 0
+		}
+	},
+	"assets": {
+		"assets/BkHonpCM-bundle-graph.json": {
+			"name": "bundle-graph.json",
+			"size": 51
+		}
+	},
+	"symbols": {
+		"s_0hGdVutamcA": {
+			"displayName": "Recommended.tsx_Recommended_component_useVisibleTask",
+			"hash": "0hGdVutamcA",
+			"ctxKind": "function",
+			"ctxName": "useVisibleTask$",
+			"captures": true,
+			"canonicalFilename": "Recommended.tsx_Recommended_component_useVisibleTask_0hGdVutamcA",
+			"parent": "s_Yuvg4rO9WE4",
+			"origin": "components/Recommended.tsx",
+			"loc": [
+				179,
+				460
+			]
+		},
+		"s_QkC8rfaCt4g": {
+			"displayName": "Login.tsx_Login_component_useVisibleTask",
+			"hash": "QkC8rfaCt4g",
+			"ctxKind": "function",
+			"ctxName": "useVisibleTask$",
+			"captures": true,
+			"canonicalFilename": "Login.tsx_Login_component_useVisibleTask_QkC8rfaCt4g",
+			"parent": "s_0hhpT5PeCFg",
+			"origin": "components/Login.tsx",
+			"loc": [
+				226,
+				827
+			]
+		},
+		"s_0hhpT5PeCFg": {
+			"displayName": "Login.tsx_Login_component",
+			"hash": "0hhpT5PeCFg",
+			"ctxKind": "function",
+			"ctxName": "component$",
+			"captures": false,
+			"canonicalFilename": "Login.tsx_Login_component_0hhpT5PeCFg",
+			"parent": null,
+			"origin": "components/Login.tsx",
+			"loc": [
+				143,
+				1018
+			]
+		},
+		"s_3VRuAW0Q7rU": {
+			"displayName": "root.tsx_root_component",
+			"hash": "3VRuAW0Q7rU",
+			"ctxKind": "function",
+			"ctxName": "component$",
+			"captures": false,
+			"canonicalFilename": "root.tsx_root_component_3VRuAW0Q7rU",
+			"parent": null,
+			"origin": "../node_modules/.pnpm/@qwikdev+astro@0.8.3_@builder.io+qwik@1.20.0_vite@6.4.3_@types+node@24.13.2_jiti@2.7.0__c05a1fc1ad0de9ba0d01fbf43cb10dbc/node_modules/@qwikdev/astro/src/root.tsx",
+			"loc": [
+				81,
+				136
+			]
+		},
+		"s_Yuvg4rO9WE4": {
+			"displayName": "Recommended.tsx_Recommended_component",
+			"hash": "Yuvg4rO9WE4",
+			"ctxKind": "function",
+			"ctxName": "component$",
+			"captures": false,
+			"canonicalFilename": "Recommended.tsx_Recommended_component_Yuvg4rO9WE4",
+			"parent": null,
+			"origin": "components/Recommended.tsx",
+			"loc": [
+				115,
+				535
+			]
+		},
+		"s_g8hgguUEJf0": {
+			"displayName": "Login.tsx_login",
+			"hash": "g8hgguUEJf0",
+			"ctxKind": "function",
+			"ctxName": "$",
+			"captures": false,
+			"canonicalFilename": "Login.tsx_login_g8hgguUEJf0",
+			"parent": null,
+			"origin": "components/Login.tsx",
+			"loc": [
+				1045,
+				1662
+			]
+		}
+	},
+	"qwikLoader": "q-naDMFAHy.js",
+	"platform": {
+		"vite": "",
+		"rollup": "4.62.2",
+		"env": "node",
+		"os": "darwin",
+		"node": "24.17.0"
+	}
+}

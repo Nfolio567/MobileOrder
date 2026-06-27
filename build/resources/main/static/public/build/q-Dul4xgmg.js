@@ -1,0 +1,1 @@
+import{_ as t}from"./q-BMNM21mH.js";import{L as r,K as a,I as s,a as o}from"./q-Dz0wz8Gq.js";const n=()=>{const e=r();return a(o(()=>t(()=>import("./q-BDLeJqtC.js"),[]),"s_QkC8rfaCt4g",[e])),s("main",null,{class:"flex items-center justify-center w-dvw h-dvh"},s("p",{ref:e},{class:"text-4xl font-extrabold"},"ログイン中",3,null),1,"UE_0")};export{n as s_0hhpT5PeCFg};

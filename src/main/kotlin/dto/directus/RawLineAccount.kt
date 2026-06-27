@@ -1,3 +1,6 @@
 package dto.directus
 
-data class RawLineAccount(val uuid: String, val lineID: String)
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class RawLineAccount(val id: String, val accountID: String)
