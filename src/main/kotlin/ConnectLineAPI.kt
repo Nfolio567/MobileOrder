@@ -10,7 +10,9 @@ import one.nfolio.dto.line.VerifyToken
 class ConnectLineAPI(private val client: HttpClient, private val environment: ApplicationEnvironment, apiVersion: String) {
   private val lineAPIRequestURL = "https://api.line.me/oauth2/v$apiVersion"
 
-  suspend fun verifyIDToken(token: String): VerifyToken? {
+  suspend fun verifyIDToken(token: String?): VerifyToken? { // tokenがnullの場合はそのままnullを返す。呼び出し元でnullチェック
+    if (token == null) return null
+
     val res = client.submitForm(
       url = "$lineAPIRequestURL/verify",
       formParameters = Parameters.build {

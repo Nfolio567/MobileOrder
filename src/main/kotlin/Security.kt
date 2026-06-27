@@ -6,12 +6,10 @@ import io.ktor.server.plugins.csrf.*
 fun Application.configureSecurity() {
   install(CSRF) {
     // tests Origin is an expected value
-    allowOrigin("http://localhost:8080")
+    allowOrigin("https://mac.nfolio.one")
+
 
     // tests Origin matches Host header
-    originMatchesHost()
-
-    // custom header checks
-    checkHeader("X-CSRF-Token")
+    //originMatchesHost()
   }
 }

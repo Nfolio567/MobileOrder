@@ -22,11 +22,15 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.server.application.host
+import io.ktor.server.application.port
+import one.nfolio.dto.directus.RawRecommended
+import one.nfolio.dto.directus.SingletonDirectus
 import security.FakeOrderID
 
-class ConnectDirectus(private val client: HttpClient, environment: ApplicationEnvironment) {
+class ConnectDirectus(private val client: HttpClient, val environment: ApplicationEnvironment) {
   private val directusUrl = String.format(
-    "%s:%s",
+    "http://%s:%s",
     environment.config.property("directus.host").getString(),
     environment.config.property("directus.port").getString()
   )
@@ -37,13 +41,18 @@ class ConnectDirectus(private val client: HttpClient, environment: ApplicationEn
     return client.get("${directusUrl}/items/products") {
       header("Authorization", "Bearer $accessToken")
     }.body<Directus<RawProducts>>()
-
   }
 
   suspend fun getOptions(): Directus<RawOptions> {
     return client.get("${directusUrl}/items/options") {
       header("Authorization", "Bearer $accessToken")
     }.body<Directus<RawOptions>>()
+  }
+
+  suspend fun getRecommendedMessage(): String? {
+    return client.get("${directusUrl}/items/recommended") {
+      header("Authorization", "Bearer $accessToken")
+    }.body<SingletonDirectus<RawRecommended>>().data.message
   }
 
   suspend fun registeringOrder(order: OrderRequest, linePrimaryID: String): Pair<String, String> {
@@ -75,22 +84,25 @@ class ConnectDirectus(private val client: HttpClient, environment: ApplicationEn
 
   // 認証チェックの時にも使う。なので不正な主キーを送ってくるかもなのでnullableにしてnullを返すようにする
   suspend fun getLineUserID(id: String): String? {
-    val specificID = client.get("${directusUrl}/item/line_account?filter[id][_eq]=$id") {
+    val specificID = client.get("${directusUrl}/items/line_account?filter[id][_eq]=$id") {
       header("Authorization", "Bearer $accessToken")
     }.body<Directus<RawLineAccount>>().data
 
-    val id = if (specificID.isEmpty()) null else specificID[0].lineID
+    val id = if (specificID.isEmpty()) null else specificID[0].accountID
 
     return id
   }
 
   suspend fun registeringLineID(id: String): String {
+    environment.log.info("Registering line ID: {}:{}", environment.config.host, environment.config.port)
+
     val res = client.post("${directusUrl}/items/line_account") {
+      header("Authorization", "Bearer $accessToken")
       contentType(ContentType.Application.Json)
       setBody(LineIDRegister(id))
-    }.body<RawLineAccount>()
+    }.body<SingletonDirectus<RawLineAccount>>()
 
-    return res.uuid
+    return res.data.id
   }
 
   private suspend fun registeringLinePrimaryIDAndFakeID(linePrimaryID: String): Pair<String, String> {

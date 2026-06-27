@@ -1,3 +1,6 @@
 package dto.regitering
 
-data class LineIDRegister(val lineID: String)
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class LineIDRegister(val accountID: String)
