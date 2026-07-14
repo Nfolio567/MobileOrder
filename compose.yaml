@@ -16,6 +16,8 @@ services:
   cms:
     container_name: mobile-order-directus-0
     image: directus/directus:latest
+    env_file:
+      - /Users/kosei/Documents/IntelliJ/mobile_order/.env
     environment:
       DB_CLIENT: pg
       DB_HOST: db

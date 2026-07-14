@@ -1,6 +1,15 @@
 package one.nfolio
 
 import io.ktor.server.application.*
+import one.nfolio.plugin.configureAuthentication
+import one.nfolio.plugin.configureHttp
+import one.nfolio.plugin.configureLogging
+import one.nfolio.plugin.configureSecurity
+import one.nfolio.plugin.configureSerialization
+import one.nfolio.plugin.configureSessions
+import one.nfolio.plugin.configureWebsockets
+import one.nfolio.service.LineOauthService
+import one.nfolio.service.DirectusService
 import security.HMAC
 
 fun main(args: Array<String>) {
@@ -9,9 +18,10 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
   val client = configureClient()
-  val line = ConnectLineAPI(client, environment, "2.1")
-  val directus = ConnectDirectus(client, environment)
+  val line = LineOauthService(client, environment, "2.1")
+  val directus = DirectusService(client, environment)
 
+  configureLogging()
   configureHttp()
   configureSecurity()
   configureWebsockets()

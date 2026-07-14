@@ -1,8 +1,8 @@
-package one.nfolio
+package one.nfolio.plugin
 
 import io.ktor.server.application.*
 import io.ktor.server.sessions.*
-import one.nfolio.sessions.LineUserSession
+import one.nfolio.dto.sessions.LineUserSession
 
 fun Application.configureSessions() {
   install(Sessions) {

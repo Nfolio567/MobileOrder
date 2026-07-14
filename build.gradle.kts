@@ -31,6 +31,7 @@ dependencies {
   implementation(libs.ktor.client.content.negotiation)
   implementation("io.ktor:ktor-server-auth:3.5.0")
   implementation("io.ktor:ktor-server-sessions:3.5.0")
+  implementation("io.ktor:ktor-server-call-logging:3.5.0")
 
   testImplementation(kotlin("test"))
   testImplementation(ktorLibs.server.testHost)

@@ -1,4 +1,4 @@
-package one.nfolio
+package one.nfolio.service
 
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -7,7 +7,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import one.nfolio.dto.line.VerifyToken
 
-class ConnectLineAPI(private val client: HttpClient, private val environment: ApplicationEnvironment, apiVersion: String) {
+class LineOauthService(private val client: HttpClient, private val environment: ApplicationEnvironment, apiVersion: String) {
   private val lineAPIRequestURL = "https://api.line.me/oauth2/v$apiVersion"
 
   suspend fun verifyIDToken(token: String?): VerifyToken? { // tokenがnullの場合はそのままnullを返す。呼び出し元でnullチェック

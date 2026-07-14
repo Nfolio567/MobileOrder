@@ -1,4 +1,4 @@
-package one.nfolio.sessions
+package one.nfolio.dto.sessions
 
 import kotlinx.serialization.Serializable
 
