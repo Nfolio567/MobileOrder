@@ -9,6 +9,8 @@ import io.ktor.server.request.path
 import io.ktor.server.response.respondRedirect
 import one.nfolio.service.DirectusService
 import one.nfolio.dto.sessions.LineUserSession
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 fun Application.configureAuthentication(directus: DirectusService) {
   install(Authentication) {
@@ -20,9 +22,9 @@ fun Application.configureAuthentication(directus: DirectusService) {
       }
 
       challenge {
-        val path = call.request.path()
-        call.respondRedirect("/?redirect=$path")
-        call.application.log.info("Redirect to '/' from '${path}'")
+        val encodedPath = URLEncoder.encode(call.request.path(), StandardCharsets.UTF_8)
+        call.respondRedirect("/?redirect=$encodedPath") // 認証成功したら元のページに戻れるように
+        call.application.log.info("Redirect to '/' from '${encodedPath}'")
       }
     }
   }

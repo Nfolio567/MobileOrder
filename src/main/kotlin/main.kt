@@ -10,6 +10,7 @@ import one.nfolio.plugin.configureSessions
 import one.nfolio.plugin.configureWebsockets
 import one.nfolio.service.LineOauthService
 import one.nfolio.service.DirectusService
+import one.nfolio.service.MyVerifyService
 import security.HMAC
 
 fun main(args: Array<String>) {
@@ -20,6 +21,7 @@ fun Application.module() {
   val client = configureClient()
   val line = LineOauthService(client, environment, "2.1")
   val directus = DirectusService(client, environment)
+  val verifyService = MyVerifyService(directus, line, environment)
 
   configureLogging()
   configureHttp()
@@ -30,7 +32,7 @@ fun Application.module() {
   configureAuthentication(directus)
   configureRouting(
     directus,
-    line,
-    HMAC(environment)
+    HMAC(environment),
+    verifyService
   )
 }

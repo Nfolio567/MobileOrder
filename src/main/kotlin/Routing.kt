@@ -11,15 +11,16 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import one.nfolio.dto.receive.Cart
-import one.nfolio.dto.receive.QRResult
+import one.nfolio.dto.receive.IsExistsUser
+import one.nfolio.dto.receive.QRReceive
 import one.nfolio.dto.receive.UpdateCartQuantity
 import one.nfolio.dto.receive.UserLogin
 import one.nfolio.dto.response.ErrorMessage
+import one.nfolio.dto.response.QRResult
 import one.nfolio.dto.sessions.LineUserSession
 import one.nfolio.service.DirectusService
 import one.nfolio.service.MyVerifyService
 import security.HMAC
-import java.nio.charset.StandardCharsets
 import java.util.*
 
 fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerifyService: MyVerifyService) {
@@ -58,7 +59,23 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
       } catch (e: Exception) {
         log.warn("'/login' receive error", e)
         call.respond(HttpStatusCode.InternalServerError)
-        return@post
+      }
+    }
+
+    post("/is-exists-user") {
+      try {
+        log.info("unko")
+        val res = call.receive<IsExistsUser>()
+        log.info("unchi")
+        val isExists = myVerifyService.isExistsUser(res)
+        log.info("unpi")
+        if (isExists == null) {
+          call.respond(HttpStatusCode.Unauthorized)
+        }
+        call.respond(mapOf("isExists" to isExists))
+      } catch (e: Exception) {
+        log.warn("'{}' error", call.request.path(), e)
+        call.respond(HttpStatusCode.InternalServerError)
       }
     }
 
@@ -243,6 +260,77 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
       }
 
 
+      /******************************************************************************/
+      // 以下adminゾーン
+
+      get("/admin") {
+        try {
+          val userID = verifyStaff(directus)
+          call.respondRedirect("/admin/${userID}")
+        } catch (e: Exception) {
+          log.warn("{} error", call.request.path(), e)
+          call.respond(HttpStatusCode.InternalServerError)
+        }
+      }
+
+      get("/admin/{userID}") {
+        try {
+          staffRoutingCheck(directus, call.parameters["userID"]!!)
+          call.respondResource("/static/private/admin/index.html")
+        } catch (e: Exception) {
+          log.warn("{} error", call.request.path(), e)
+          call.respond(HttpStatusCode.InternalServerError)
+        }
+      }
+
+      get("/admin/{userID}/qr-result") {
+        try {
+          staffRoutingCheck(directus, call.parameters["userID"]!!)
+          call.respondResource("/static/private/qr-result/index.html")
+        } catch (e: Exception) {
+          log.warn("{} error", call.request.path(), e)
+          call.respond(HttpStatusCode.InternalServerError)
+        }
+      }
+
+      post("/admin/{userID}/qr-result") { // フロント側で読み込んだQRコードを受け取って、検証＆結果返し
+        try {
+          staffRoutingCheck(directus, call.parameters["userID"]!!)
+          val res = call.receive<QRReceive>()
+          val splitContent = res.qrContent.split(":") // primaryID:HMAC
+          val userPrimaryID = splitContent[0]
+          val decodedHMAC = Base64
+            .getUrlDecoder()
+            .decode(splitContent[1])
+
+          // HMAC検証
+          val isCorrectVerifyHMAC = hmac.verify(userPrimaryID, decodedHMAC)
+          if (isCorrectVerifyHMAC) {
+            val isStaff = directus.isStaffUser(userPrimaryID)
+            val isAdministrator = directus.isAdminUser(userPrimaryID)
+            val userName = directus.getUserName(userPrimaryID)
+            val userOrders = directus.getUserOrder(userPrimaryID)
+
+            call.respond(
+              QRResult(
+                isAdministrator,
+                isStaff,
+                userName,
+                userOrders
+              )
+            )
+          } else {
+            call.respond(emptyMap<String, Any>()) // 空JSON
+          }
+        } catch (e: Exception) {
+          log.warn("{} error", call.request.path(), e)
+          call.respond(HttpStatusCode.InternalServerError)
+        }
+      }
+
+      post("/admin/{userID}/change-permission") {
+
+      }
     }
   }
 }
@@ -252,10 +340,21 @@ suspend fun verifyCart(cartID: Int?, userID: String, directus: DirectusService):
   return cart.data.any { it.id == cartID }
 }
 
-suspend fun RoutingContext.verifyAdmin(directus: DirectusService) {
+suspend fun RoutingContext.verifyStaff(directus: DirectusService): String? {
   val primaryID = call.principal<LineUserSession>()!!.linePrimaryID
 
-  if (!directus.isAdminUser(primaryID)) {
+  if (!directus.isStaffUser(primaryID)) {
+    call.respondRedirect("/home")
+    return null
+  }
+
+  return primaryID
+}
+
+suspend fun RoutingContext.staffRoutingCheck(directus: DirectusService, pathUserID: String) {
+  val primaryID = verifyStaff(directus)
+
+  if (primaryID != pathUserID) {
     call.respondRedirect("/home")
   }
 }

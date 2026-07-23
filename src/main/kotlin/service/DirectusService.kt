@@ -166,22 +166,40 @@ class DirectusService(private val client: HttpClient, val environment: Applicati
     return primaryID
   }
 
+  suspend fun getUserName(userID: String): String {
+    return client.get("${directusUrl}/items/line_account?filter[id][_eq]=$userID") {
+      header("Authorization", "Bearer $accessToken")
+    }.body<Directus<RawLineAccount>>().data.first().name
+  }
+
   suspend fun isAdminUser(userID: String): Boolean { // アカウント情報ありきなので、nullチェックはなし
     return client.get("${directusUrl}/items/line_account?filter[id][_eq]=$userID") {
       header("Authorization", "Bearer $accessToken")
     }.body<Directus<RawLineAccount>>().data[0].isAdmin
   }
 
-  suspend fun registeringLineID(id: String): String { // ユーザー登録
+  suspend fun isStaffUser(userID: String): Boolean {
+    return client.get("${directusUrl}/items/line_account?filter[id][_eq]=$userID") {
+      header("Authorization", "Bearer $accessToken")
+    }.body<Directus<RawLineAccount>>().data[0].isStaff
+  }
+
+  suspend fun registeringLineIDAndName(id: String, name: String, isGetAndNotUsedCoupon: Boolean): String { // ユーザー登録
     environment.log.info("Registering line ID: {}:{}", environment.config.host, environment.config.port)
 
     val res = client.post("${directusUrl}/items/line_account") {
       header("Authorization", "Bearer $accessToken")
       contentType(ContentType.Application.Json)
-      setBody(LineIDRegister(id))
+      setBody(LineIDRegister(id, name, isGetAndNotUsedCoupon))
     }.body<SingletonDirectus<RawLineAccount>>()
 
     return res.data.id
+  }
+
+  suspend fun getUserOrder(userID: String): List<RawOrders> {
+    return client.get("${directusUrl}/items/orders?filter[userID][_eq]=$userID") {
+      header("Authorization", "Bearer $accessToken")
+    }.body<Directus<RawOrders>>().data
   }
 
   // なんかようわからんメソッド。後で書き直す。なんでwhileなんやろ。

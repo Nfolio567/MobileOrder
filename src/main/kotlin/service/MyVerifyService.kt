@@ -1,10 +1,12 @@
 package one.nfolio.service
 
 import io.ktor.server.application.ApplicationEnvironment
+import one.nfolio.dto.receive.IsExistsUser
 import one.nfolio.dto.receive.UserLogin
-import one.nfolio.dto.sessions.LineUserSession
+import java.time.LocalDate
+import java.time.ZoneId
 
-class MyVerifyService(val directusService: DirectusService, val lineOauthService: LineOauthService, environment: ApplicationEnvironment) {
+class MyVerifyService(private val directusService: DirectusService, private val lineOauthService: LineOauthService, environment: ApplicationEnvironment) {
 
   private val log = environment.log
 
@@ -16,11 +18,21 @@ class MyVerifyService(val directusService: DirectusService, val lineOauthService
     } else { // 検証成功
       var primaryID = directusService.getLinePrimaryID(lineVerifyRes.sub)
       if (primaryID == null) {
-        primaryID = directusService.registeringLineID(lineVerifyRes.sub)
+        val nowDate = LocalDate.now(ZoneId.of("Asia/Tokyo"))
+        val isCanGetCoupon = nowDate < LocalDate.parse("2026-11-07")
+        val userName = if (res.userName == "") lineVerifyRes.name else res.userName;
+
+        primaryID = directusService.registeringLineIDAndName(lineVerifyRes.sub, userName, isCanGetCoupon)
         log.info("New Member: {}", primaryID)
         log.debug("LINE Verify response: {}", lineVerifyRes)
       }
       primaryID
     }
+  }
+
+  suspend fun isExistsUser(res: IsExistsUser): Boolean? {
+    val lineVerifyRes = lineOauthService.verifyIDToken(res.token) ?: return null // そもそもトークンがおかしい場合
+    // LineAccountテーブルのIDをLINE User IDをもとに取得。存在しない場合はfalse
+    return directusService.getLinePrimaryID(lineVerifyRes.sub) != null
   }
 }

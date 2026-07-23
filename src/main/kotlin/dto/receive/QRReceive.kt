@@ -3,4 +3,4 @@ package one.nfolio.dto.receive
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserLogin(val token: String?, val userName: String)
+data class QRReceive(val qrContent: String)
