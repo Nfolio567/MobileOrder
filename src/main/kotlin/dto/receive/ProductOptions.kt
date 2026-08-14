@@ -1,4 +1,4 @@
-package dto.receive
+package one.nfolio.dto.receive
 
 import kotlinx.serialization.Serializable
 

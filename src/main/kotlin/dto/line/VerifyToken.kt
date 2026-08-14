@@ -10,6 +10,6 @@ data class VerifyToken(
   val exp: Int,
   val iat: Int,
   val amr: List<String>? = null,
-  val name: String,
-  val picture: String
+  val name: String? = null,
+  val picture: String? = null
 )

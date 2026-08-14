@@ -3,6 +3,7 @@ package one.nfolio.service
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.forms.*
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 import io.ktor.server.application.*
 import one.nfolio.dto.line.VerifyToken
@@ -20,6 +21,8 @@ class LineOauthService(private val client: HttpClient, private val environment: 
         append("client_id", environment.config.property("LIFF.id").getString())
       }
     )
+
+    environment.log.info("{}", res.bodyAsText())
 
     val resBody = if (res.status == HttpStatusCode.OK) res.body<VerifyToken>() else null
 

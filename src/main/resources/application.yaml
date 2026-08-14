@@ -4,7 +4,15 @@ ktor:
   application:
     modules:
       - one.nfolio.MainKt.module
-    route-path: /
+    route-path: https://mac.nfolio.one/
 
 directus:
-  access-token: xxxxxxxxxxxxxxxxxxxxxxxx
+  host: localhost
+  port: 8055
+  access-token: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+HMAC:
+  secret-key: xxxxxxxxxxxxxxxxxxxx
+
+LIFF:
+  id: xxxxxxxxxx

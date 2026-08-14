@@ -15,7 +15,7 @@ services:
 
   cms:
     container_name: mobile-order-directus-0
-    image: directus/directus:latest
+    image: directus/directus:11.17.4
     env_file:
       - /Users/kosei/Documents/IntelliJ/mobile_order/.env
     environment:

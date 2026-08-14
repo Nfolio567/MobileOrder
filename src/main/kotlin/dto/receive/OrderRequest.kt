@@ -1,6 +1,6 @@
-package dto.receive
+package one.nfolio.dto.receive
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class OrderRequest(val lineIDToken: String, val productOptionsList: List<ProductOptions>)
+data class OrderRequest(val productOptionsList: List<ProductOptions>)

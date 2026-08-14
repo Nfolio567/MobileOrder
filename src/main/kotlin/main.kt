@@ -12,6 +12,7 @@ import one.nfolio.service.LineOauthService
 import one.nfolio.service.DirectusService
 import one.nfolio.service.MyVerifyService
 import security.HMAC
+import kotlin.uuid.Uuid
 
 fun main(args: Array<String>) {
   io.ktor.server.cio.EngineMain.main(args)

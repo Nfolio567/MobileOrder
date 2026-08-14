@@ -1,6 +1,5 @@
 package one.nfolio
 
-import dto.receive.OrderRequest
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -10,12 +9,10 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
-import one.nfolio.dto.receive.Cart
-import one.nfolio.dto.receive.IsExistsUser
-import one.nfolio.dto.receive.QRReceive
-import one.nfolio.dto.receive.UpdateCartQuantity
-import one.nfolio.dto.receive.UserLogin
+import one.nfolio.dto.receive.*
+import one.nfolio.dto.response.AggregatedCart
 import one.nfolio.dto.response.ErrorMessage
+import one.nfolio.dto.response.MinimumProduct
 import one.nfolio.dto.response.QRResult
 import one.nfolio.dto.sessions.LineUserSession
 import one.nfolio.service.DirectusService
@@ -23,77 +20,65 @@ import one.nfolio.service.MyVerifyService
 import security.HMAC
 import java.util.*
 
+
 fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerifyService: MyVerifyService) {
   routing {
     staticResources("/", "/static/public")
 
-    post("/login") { // 最初にここにリクエスト送らせて、認証チェックする。未ログインならログイン処理をする。
-      try {
-        val session = call.principal<LineUserSession>()
+    tryPost("/login") { // 最初にここにリクエスト送らせて、認証チェックする。未ログインならログイン処理をする。
+      val session = call.principal<LineUserSession>()
 
-        log.info("Session: {}\n{}", call.request.origin.remoteHost, session)
+      log.info("Session: {}\n{}", call.request.origin.remoteHost, session)
 
-        // セッション自体があるか否か・ちゃんとテーブルにIDが記録されてるか否か
-        if (session == null || directus.getLineUserID(session.linePrimaryID) == null) { // セッションがない
-          val res = call.receive<UserLogin>()
-          val primaryID = myVerifyService.baseLogin(res)
+      // セッション自体があるか否か・ちゃんとテーブルにIDが記録されてるか否か
+      if (session == null || directus.getLineUserID(session.linePrimaryID) == null) { // セッションがない
+        val res = call.receive<UserLogin>()
+        val primaryID = myVerifyService.baseLogin(res)
 
-          if (primaryID != null) { // 検証成功
-            log.info("Session set: {}", call.request.origin.remoteHost)
-            call.sessions.set(LineUserSession(primaryID))
-          } else { // 検証失敗
-            call.respond(
-              HttpStatusCode.Unauthorized,
-              ErrorMessage(
-                "Unauthorized",
-                "The token is invalid or null."
-              )
+        if (primaryID != null) { // 検証成功
+          log.info("Session set: {}", call.request.origin.remoteHost)
+          call.sessions.set(LineUserSession(primaryID))
+        } else { // 検証失敗
+          call.respond(
+            HttpStatusCode.Unauthorized,
+            ErrorMessage(
+              "Unauthorized",
+              "The token is invalid or null."
             )
-            log.info("Return 401: {}", call.request.origin.remoteHost)
-            return@post
-          }
+          )
+          log.info("Return 401: {}", call.request.origin.remoteHost)
+          return@tryPost
         }
-
-        call.respond(mapOf("redirect" to "/home"))
-        log.debug("Redirect request to /home or other: {}", call.request.origin.remoteHost)
-      } catch (e: Exception) {
-        log.warn("'/login' receive error", e)
-        call.respond(HttpStatusCode.InternalServerError)
       }
+
+      call.respond(mapOf("redirect" to "/home"))
+      log.debug("Redirect request to /home or other: {}", call.request.origin.remoteHost)
     }
 
-    post("/is-exists-user") {
-      try {
-        log.info("unko")
-        val res = call.receive<IsExistsUser>()
-        log.info("unchi")
-        val isExists = myVerifyService.isExistsUser(res)
-        log.info("unpi")
-        if (isExists == null) {
-          call.respond(HttpStatusCode.Unauthorized)
-        }
-        call.respond(mapOf("isExists" to isExists))
-      } catch (e: Exception) {
-        log.warn("'{}' error", call.request.path(), e)
-        call.respond(HttpStatusCode.InternalServerError)
+    tryPost("/is-exists-user") {
+      val res = call.receive<IsExistsUser>()
+      val isExists = myVerifyService.isExistsUser(res)
+      if (isExists == null) {
+        call.respond(HttpStatusCode.Unauthorized)
       }
+      call.respond(mapOf("isExists" to isExists))
     }
 
 
     authenticate("line-user-session") {
-      get("/home") {
+      tryGet("/home") {
         call.respondResource("/static/private/home/index.html")
       }
 
-      get("/member") {
+      tryGet("/member") {
         call.respondResource("/static/private/member/index.html")
       }
 
-      get("/cart") {
+      tryGet("/cart") {
         call.respondResource("/static/private/cart/index.html")
       }
 
-      get("/api/get/products") {
+      tryGet("/api/get/products") {
         call.respond(
           mapOf(
             "products" to directus.getProducts().data
@@ -101,7 +86,7 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
         )
       }
 
-      get("/api/get/options") {
+      tryGet("/api/get/options") {
         call.respond(
           mapOf(
             "options" to directus.getOptions().data
@@ -109,7 +94,7 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
         )
       }
 
-      get("/api/get/recommended") {
+      tryGet("/api/get/recommended") {
         call.respond(
           mapOf(
             "message" to directus.getRecommendedMessage()
@@ -117,60 +102,72 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
         )
       }
 
-      get("/api/get/cart") {
-        try {
-          val userID = call.principal<LineUserSession>()!!.linePrimaryID
+      tryGet("/api/get/cart") {
+        val userID = call.principal<LineUserSession>()!!.linePrimaryID
+
+        val cartContent = directus.getCart(userID).data
+        val products = directus.getProducts()
+        val options = directus.getOptions()
+
+        val aggregatedCart = cartContent.map { cart ->
+          val addedOptions = cart.optionIDs.map { id ->
+            log.info("{}, {}", options.data, id)
+            options.data.find { it.id == id.optionsID.id }!!
+          }
+          val product = products.data.find { it.id == cart.productID }!!
+
+          AggregatedCart(
+            cart.id,
+            addedOptions,
+            MinimumProduct(product.id, product.name, product.price),
+            cart.quantity
+          )
+        }
+
+        call.respond(
+          mapOf(
+            "cart" to aggregatedCart
+          )
+        )
+      }
+
+      tryDelete("/api/delete/cart/{id}") {
+        val cartID = call.parameters["id"]?.toInt()
+
+        val userID = call.principal<LineUserSession>()!!.linePrimaryID
+
+        if (myVerifyService.verifyCart(cartID, userID, directus)) {
+          cartID?.let { directus.deleteCart(it) }
 
           call.respond(
             mapOf(
-              "cart" to directus.getCart(userID).data
+              "status" to "success"
             )
           )
-        } catch (e: Exception) {
-          log.warn("{} error", call.request.path(), e)
-          call.respond(HttpStatusCode.InternalServerError)
+        } else {
+          call.respond(HttpStatusCode.Unauthorized)
         }
       }
 
-      delete("/api/delete/cart/{id}") {
-        try {
-          val cartID = call.parameters["id"]?.toInt()
-
-          val userID = call.principal<LineUserSession>()!!.linePrimaryID
-
-          if (verifyCart(cartID, userID, directus)) {
-            cartID?.let { directus.deleteCart(it) }
-
-            call.respond(mapOf(
-              "status" to "success"
-            ))
-          } else {
-            call.respond(HttpStatusCode.Unauthorized)
-          }
-        } catch (e: Exception) {
-          log.warn("{} error", call.request.path(), e)
-          call.respond(HttpStatusCode.InternalServerError)
-        }
-      }
-
-      patch("/api/patch/cart") { // カート内の商品の個数の変更
+      patch("/api/patch/cart") { // カート内の商品の個数の変更(めんどくさいからまだフロント実装してない）
         try {
           val res = call.receive<UpdateCartQuantity>()
 
           val userID = call.principal<LineUserSession>()!!.linePrimaryID
 
-          if (verifyCart(res.id, userID, directus)) {
+          if (myVerifyService.verifyCart(res.id, userID, directus)) {
             directus.updateCart(res.id, res.quantity)
 
-            call.respond(mapOf(
-              "status" to "success"
-            ))
+            call.respond(
+              mapOf(
+                "status" to "success"
+              )
+            )
           } else {
             call.respond(HttpStatusCode.Unauthorized)
           }
         } catch (e: Exception) {
-          log.warn("{} error", call.request.path(), e)
-          call.respond(HttpStatusCode.InternalServerError)
+          errorResponse(e)
         }
       }
 
@@ -181,65 +178,58 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
 
           directus.registeringCart(res, userID)
 
-          call.respond(mapOf(
-            "status" to "success"
-          ))
-        } catch (e: Exception) {
-          log.warn("{} error", call.request.path(), e)
           call.respond(
-            HttpStatusCode.InternalServerError,
             mapOf(
-              "status" to "failed"
+              "status" to "success"
             )
+          )
+        } catch (e: Exception) {
+          errorResponse(
+            e,
+            "status" to "failed"
           )
         }
       }
 
 
-      get("/api/get/coupon") {
-        try {
-          val userID = call.principal<LineUserSession>()!!.linePrimaryID
-          val isCouponValid = directus.isCouponValid(userID)
+      tryGet("/api/get/coupon") {
+        val userID = call.principal<LineUserSession>()!!.linePrimaryID
+        val isCouponValid = directus.isCouponValid(userID)
 
-          if (isCouponValid){
-            call.respond(mapOf(
+        if (isCouponValid) {
+          call.respond(
+            mapOf(
               "status" to "ok",
               "name" to "先行登録ありがとうクーポン"
-            ))
-          } else {
-            call.respond(mapOf(
+            )
+          )
+        } else {
+          call.respond(
+            mapOf(
               "status" to "failed"
-            ))
-          }
-
-        } catch (e: Exception) {
-          log.warn("{} error", call.request.path(), e)
-          call.respond(HttpStatusCode.InternalServerError)
+            )
+          )
         }
+
       }
 
 
-      post("/api/post/order") {
+      tryPost("/api/post/order") {
         val res = call.receive<OrderRequest>()
 
         val linePrimaryID = call.principal<LineUserSession>()!!.linePrimaryID
         val orderIDAndFakeID = directus.registeringOrder(res, linePrimaryID)
 
-        val macBase64 = Base64
-          .getUrlEncoder()
-          .withoutPadding()
-          .encodeToString(hmac.generateMAC(orderIDAndFakeID.first))
-
         call.respond(
           mapOf(
-            "orderID" to orderIDAndFakeID.second
+            "orderID" to orderIDAndFakeID.fakeID
           )
         )
       }
 
 
 
-      get("/api/get/memberID") {
+      tryGet("/api/get/memberID") {
         val session = call.principal<LineUserSession>()
 
         val macBase64 = Base64
@@ -251,110 +241,141 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
       }
 
 
-      get("/create-checkout-session") {
+      tryGet("/create-checkout-session") {
 
       }
 
-      post("/webhook/payjp") {
+      tryPost("/webhook/payjp") {
 
       }
 
 
       /******************************************************************************/
-      // 以下adminゾーン
+      // 以下staffゾーン
 
-      get("/admin") {
-        try {
-          val userID = verifyStaff(directus)
-          call.respondRedirect("/admin/${userID}")
-        } catch (e: Exception) {
-          log.warn("{} error", call.request.path(), e)
-          call.respond(HttpStatusCode.InternalServerError)
-        }
+      tryGet("/staff") {
+        val userID = verifyStaff(directus)
+        call.respondRedirect("/staff/${userID}")
       }
 
-      get("/admin/{userID}") {
-        try {
-          staffRoutingCheck(directus, call.parameters["userID"]!!)
-          call.respondResource("/static/private/admin/index.html")
-        } catch (e: Exception) {
-          log.warn("{} error", call.request.path(), e)
-          call.respond(HttpStatusCode.InternalServerError)
-        }
+      tryGet("/staff/{userID}") {
+        staffPathCheck(directus)
+        call.respondResource("/static/private/staff/index.html")
       }
 
-      get("/admin/{userID}/qr-result") {
-        try {
-          staffRoutingCheck(directus, call.parameters["userID"]!!)
-          call.respondResource("/static/private/qr-result/index.html")
-        } catch (e: Exception) {
-          log.warn("{} error", call.request.path(), e)
-          call.respond(HttpStatusCode.InternalServerError)
-        }
+      tryGet("/staff/{userID}/qr-result") {
+        staffPathCheck(directus)
+        call.respondResource("/static/private/qr-result/index.html")
       }
 
-      post("/admin/{userID}/qr-result") { // フロント側で読み込んだQRコードを受け取って、検証＆結果返し
-        try {
-          staffRoutingCheck(directus, call.parameters["userID"]!!)
-          val res = call.receive<QRReceive>()
-          val splitContent = res.qrContent.split(":") // primaryID:HMAC
-          val userPrimaryID = splitContent[0]
-          val decodedHMAC = Base64
-            .getUrlDecoder()
-            .decode(splitContent[1])
+      tryGet("/staff/{userID}/is-admin") {
+        staffPathCheck(directus)
+        val isAdmin = directus.isAdminUser(call.parameters["userID"]!!)
+        call.respond(mapOf(
+          "isAdmin" to isAdmin
+        ))
+      }
 
-          // HMAC検証
-          val isCorrectVerifyHMAC = hmac.verify(userPrimaryID, decodedHMAC)
-          if (isCorrectVerifyHMAC) {
-            val isStaff = directus.isStaffUser(userPrimaryID)
-            val isAdministrator = directus.isAdminUser(userPrimaryID)
-            val userName = directus.getUserName(userPrimaryID)
-            val userOrders = directus.getUserOrder(userPrimaryID)
+      tryPost("/staff/{userID}/qr-result") { // フロント側で読み込んだQRコードを受け取って、検証＆結果返し
+        staffPathCheck(directus)
+        val res = call.receive<QRReceive>()
+        val splitContent = res.qrContent.split(":") // primaryID:HMAC
+        val userPrimaryID = splitContent[0]
+        val decodedHMAC = Base64
+          .getUrlDecoder()
+          .decode(splitContent[1])
 
-            call.respond(
-              QRResult(
-                isAdministrator,
-                isStaff,
-                userName,
-                userOrders
-              )
+        // HMAC検証
+        val isCorrectVerifyHMAC = hmac.verify(userPrimaryID, decodedHMAC)
+        if (isCorrectVerifyHMAC) {
+          val isStaff = directus.isStaffUser(userPrimaryID)
+          val isAdministrator = directus.isAdminUser(userPrimaryID)
+          val userName = directus.getUserName(userPrimaryID)
+          val userOrders = directus.getUserOrder(userPrimaryID)
+
+          call.respond(
+            QRResult(
+              isAdministrator,
+              isStaff,
+              userPrimaryID,
+              userName,
+              userOrders
             )
-          } else {
-            call.respond(emptyMap<String, Any>()) // 空JSON
-          }
-        } catch (e: Exception) {
-          log.warn("{} error", call.request.path(), e)
-          call.respond(HttpStatusCode.InternalServerError)
+          )
+        } else {
+          call.respond(emptyMap<String, Any>()) // 空JSON
         }
       }
 
-      post("/admin/{userID}/change-permission") {
+      tryPost("/staff/{userID}/change-permission") {
+        val pathUserID = call.parameters["userID"]!!
 
+        staffPathCheck(directus)
+        val isAdmin = directus.isAdminUser(pathUserID)
+        if (!isAdmin) {
+          call.respond(HttpStatusCode.Unauthorized)
+        }
+
+        val res = call.receive<ChangePermission>()
+        if (!res.isStaff && res.isAdmin) { // スタッフじゃないのに管理者になろうとしたらバカにする
+          call.respond(
+            HttpStatusCode.BadRequest,
+            ErrorMessage(
+              "Are you stupid?",
+              "This account isn't even a staff member, so there's no way it can be an admin, you idiot (lol)"
+            )
+          )
+          return@tryPost
+        }
+
+        directus.changeUserPermission(res.targetUserID, res.isAdmin, res.isStaff)
+        call.respond(mapOf(
+          "status" to "success"
+        ))
+      }
+
+      tryGet("/staff/{userID}/pos") {
+        staffPathCheck(directus)
+        call.respondResource("/static/private/pos/index.html")
+      }
+
+      tryPost("/staff/{userID}/pos") {
+        // これがnullの場合はそもそも/homeに飛ばされてるので実質none null
+        val userID = staffPathCheck(directus)!!
+        val res = call.receive<OrderRequest>()
+
+        val orderIDPair = directus.registeringOrder(res, userID, true)
+
+        call.respond(mapOf(
+          "orderID" to orderIDPair.fakeID
+        ))
       }
     }
   }
 }
 
-suspend fun verifyCart(cartID: Int?, userID: String, directus: DirectusService): Boolean { // そのカートが本当に本人のものなのか
-  val cart = directus.getCart(userID)
-  return cart.data.any { it.id == cartID }
-}
+
+/*************************/
+// 以下、Routing method
 
 suspend fun RoutingContext.verifyStaff(directus: DirectusService): String? {
-  val primaryID = call.principal<LineUserSession>()!!.linePrimaryID
+  val userID = call.principal<LineUserSession>()!!.linePrimaryID
 
-  if (!directus.isStaffUser(primaryID)) {
+  if (!directus.isStaffUser(userID)) {
     call.respondRedirect("/home")
     return null
   }
 
-  return primaryID
+  return userID
 }
 
-suspend fun RoutingContext.staffRoutingCheck(directus: DirectusService, pathUserID: String) {
-  val primaryID = verifyStaff(directus)
+suspend fun RoutingContext.staffPathCheck(directus: DirectusService): String? {
+  val userID = verifyStaff(directus) // この時点でスタッフじゃなきゃ '/home' に強制送還
 
-  if (primaryID != pathUserID) {
+  if (userID != call.pathParameters["userID"]) {
     call.respondRedirect("/home")
+    return null
   }
+
+  return userID
 }
