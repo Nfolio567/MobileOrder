@@ -1,14 +1,25 @@
 package one.nfolio
 
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.Application
+import io.ktor.server.application.log
+import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.principal
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.plugins.origin
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.server.sessions.*
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondRedirect
+import io.ktor.server.response.respondResource
+import io.ktor.server.routing.RoutingContext
+import io.ktor.server.routing.patch
+import io.ktor.server.routing.post
+import io.ktor.server.routing.routing
+import io.ktor.server.sessions.sessions
+import io.ktor.server.sessions.set
+import io.ktor.server.websocket.DefaultWebSocketServerSession
+import io.ktor.server.websocket.webSocket
+import kotlinx.coroutines.awaitCancellation
 import one.nfolio.dto.receive.*
 import one.nfolio.dto.response.AggregatedCart
 import one.nfolio.dto.response.ErrorMessage
@@ -20,12 +31,18 @@ import one.nfolio.service.MyVerifyService
 import security.HMAC
 import java.util.*
 
+val sessions = mutableSetOf<DefaultWebSocketServerSession>()
 
-fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerifyService: MyVerifyService) {
+fun Application.configureRouting(
+  directus: DirectusService,
+  hmac: HMAC,
+  myVerifyService: MyVerifyService,
+) {
   routing {
     staticResources("/", "/static/public")
 
-    tryPost("/login") { // 最初にここにリクエスト送らせて、認証チェックする。未ログインならログイン処理をする。
+    tryPost("/login") {
+      // 最初にここにリクエスト送らせて、認証チェックする。未ログインならログイン処理をする。
       val session = call.principal<LineUserSession>()
 
       log.info("Session: {}\n{}", call.request.origin.remoteHost, session)
@@ -43,8 +60,8 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
             HttpStatusCode.Unauthorized,
             ErrorMessage(
               "Unauthorized",
-              "The token is invalid or null."
-            )
+              "The token is invalid or null.",
+            ),
           )
           log.info("Return 401: {}", call.request.origin.remoteHost)
           return@tryPost
@@ -64,7 +81,6 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
       call.respond(mapOf("isExists" to isExists))
     }
 
-
     authenticate("line-user-session") {
       tryGet("/home") {
         call.respondResource("/static/private/home/index.html")
@@ -81,24 +97,24 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
       tryGet("/api/get/products") {
         call.respond(
           mapOf(
-            "products" to directus.getProducts().data
-          )
+            "products" to directus.getProducts().data,
+          ),
         )
       }
 
       tryGet("/api/get/options") {
         call.respond(
           mapOf(
-            "options" to directus.getOptions().data
-          )
+            "options" to directus.getOptions().data,
+          ),
         )
       }
 
       tryGet("/api/get/recommended") {
         call.respond(
           mapOf(
-            "message" to directus.getRecommendedMessage()
-          )
+            "message" to directus.getRecommendedMessage(),
+          ),
         )
       }
 
@@ -109,25 +125,27 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
         val products = directus.getProducts()
         val options = directus.getOptions()
 
-        val aggregatedCart = cartContent.map { cart ->
-          val addedOptions = cart.optionIDs.map { id ->
-            log.info("{}, {}", options.data, id)
-            options.data.find { it.id == id.optionsID.id }!!
-          }
-          val product = products.data.find { it.id == cart.productID }!!
+        val aggregatedCart =
+          cartContent.map { cart ->
+            val addedOptions =
+              cart.optionIDs.map { id ->
+                log.info("{}, {}", options.data, id)
+                options.data.find { it.id == id.optionsID.id }!!
+              }
+            val product = products.data.find { it.id == cart.productID }!!
 
-          AggregatedCart(
-            cart.id,
-            addedOptions,
-            MinimumProduct(product.id, product.name, product.price),
-            cart.quantity
-          )
-        }
+            AggregatedCart(
+              cart.id,
+              addedOptions,
+              MinimumProduct(product.id, product.name, product.price),
+              cart.quantity,
+            )
+          }
 
         call.respond(
           mapOf(
-            "cart" to aggregatedCart
-          )
+            "cart" to aggregatedCart,
+          ),
         )
       }
 
@@ -141,15 +159,16 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
 
           call.respond(
             mapOf(
-              "status" to "success"
-            )
+              "status" to "success",
+            ),
           )
         } else {
           call.respond(HttpStatusCode.Unauthorized)
         }
       }
 
-      patch("/api/patch/cart") { // カート内の商品の個数の変更(めんどくさいからまだフロント実装してない）
+      patch("/api/patch/cart") {
+        // カート内の商品の個数の変更(めんどくさいからまだフロント実装してない）
         try {
           val res = call.receive<UpdateCartQuantity>()
 
@@ -160,8 +179,8 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
 
             call.respond(
               mapOf(
-                "status" to "success"
-              )
+                "status" to "success",
+              ),
             )
           } else {
             call.respond(HttpStatusCode.Unauthorized)
@@ -180,17 +199,16 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
 
           call.respond(
             mapOf(
-              "status" to "success"
-            )
+              "status" to "success",
+            ),
           )
         } catch (e: Exception) {
           errorResponse(
             e,
-            "status" to "failed"
+            "status" to "failed",
           )
         }
       }
-
 
       tryGet("/api/get/coupon") {
         val userID = call.principal<LineUserSession>()!!.linePrimaryID
@@ -200,19 +218,17 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
           call.respond(
             mapOf(
               "status" to "ok",
-              "name" to "先行登録ありがとうクーポン"
-            )
+              "name" to "先行登録ありがとうクーポン",
+            ),
           )
         } else {
           call.respond(
             mapOf(
-              "status" to "failed"
-            )
+              "status" to "failed",
+            ),
           )
         }
-
       }
-
 
       tryPost("/api/post/order") {
         val res = call.receive<OrderRequest>()
@@ -222,40 +238,35 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
 
         call.respond(
           mapOf(
-            "orderID" to orderIDAndFakeID.fakeID
-          )
+            "orderID" to orderIDAndFakeID.fakeID,
+          ),
         )
       }
-
-
 
       tryGet("/api/get/memberID") {
         val session = call.principal<LineUserSession>()
 
-        val macBase64 = Base64
-          .getUrlEncoder()
-          .withoutPadding()
-          .encodeToString(hmac.generateMAC(session!!.linePrimaryID))
+        val macBase64 =
+          Base64
+            .getUrlEncoder()
+            .withoutPadding()
+            .encodeToString(hmac.generateMAC(session!!.linePrimaryID))
 
         call.respond(mapOf("id" to "${session.linePrimaryID}:$macBase64"))
       }
 
-
       tryGet("/create-checkout-session") {
-
       }
 
       tryPost("/webhook/payjp") {
-
       }
 
 
-      /******************************************************************************/
       // 以下staffゾーン
 
       tryGet("/staff") {
         val userID = verifyStaff(directus)
-        call.respondRedirect("/staff/${userID}")
+        call.respondRedirect("/staff/$userID")
       }
 
       tryGet("/staff/{userID}") {
@@ -271,19 +282,23 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
       tryGet("/staff/{userID}/is-admin") {
         staffPathCheck(directus)
         val isAdmin = directus.isAdminUser(call.parameters["userID"]!!)
-        call.respond(mapOf(
-          "isAdmin" to isAdmin
-        ))
+        call.respond(
+          mapOf(
+            "isAdmin" to isAdmin,
+          ),
+        )
       }
 
-      tryPost("/staff/{userID}/qr-result") { // フロント側で読み込んだQRコードを受け取って、検証＆結果返し
+      tryPost("/staff/{userID}/qr-result") {
+        // フロント側で読み込んだQRコードを受け取って、検証＆結果返し
         staffPathCheck(directus)
         val res = call.receive<QRReceive>()
         val splitContent = res.qrContent.split(":") // primaryID:HMAC
         val userPrimaryID = splitContent[0]
-        val decodedHMAC = Base64
-          .getUrlDecoder()
-          .decode(splitContent[1])
+        val decodedHMAC =
+          Base64
+            .getUrlDecoder()
+            .decode(splitContent[1])
 
         // HMAC検証
         val isCorrectVerifyHMAC = hmac.verify(userPrimaryID, decodedHMAC)
@@ -299,8 +314,8 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
               isStaff,
               userPrimaryID,
               userName,
-              userOrders
-            )
+              userOrders,
+            ),
           )
         } else {
           call.respond(emptyMap<String, Any>()) // 空JSON
@@ -322,16 +337,18 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
             HttpStatusCode.BadRequest,
             ErrorMessage(
               "Are you stupid?",
-              "This account isn't even a staff member, so there's no way it can be an admin, you idiot (lol)"
-            )
+              "This account isn't even a staff member, so there's no way it can be an admin, you idiot (lol)",
+            ),
           )
           return@tryPost
         }
 
         directus.changeUserPermission(res.targetUserID, res.isAdmin, res.isStaff)
-        call.respond(mapOf(
-          "status" to "success"
-        ))
+        call.respond(
+          mapOf(
+            "status" to "success",
+          ),
+        )
       }
 
       tryGet("/staff/{userID}/pos") {
@@ -346,16 +363,35 @@ fun Application.configureRouting(directus: DirectusService, hmac: HMAC, myVerify
 
         val orderIDPair = directus.registeringOrder(res, userID, true)
 
-        call.respond(mapOf(
-          "orderID" to orderIDPair.fakeID
-        ))
+        call.respond(
+          mapOf(
+            "orderID" to orderIDPair.fakeID,
+          ),
+        )
+      }
+    }
+
+    authenticate("kds-auth") {
+      tryGet("/kds") {
+        call.respond(
+          mapOf(
+            "orders" to directus.getOrder()
+          )
+        )
+      }
+
+      webSocket("/kds-ws") {
+        sessions.add(this)
+        try {
+          awaitCancellation()
+        } finally {
+          sessions -= this
+        }
       }
     }
   }
 }
 
-
-/*************************/
 // 以下、Routing method
 
 suspend fun RoutingContext.verifyStaff(directus: DirectusService): String? {

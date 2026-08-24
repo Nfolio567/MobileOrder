@@ -1,7 +1,10 @@
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 plugins {
   alias(libs.plugins.kotlin.jvm)
   alias(ktorLibs.plugins.ktor)
   alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.ktlint)
   id("application")
 }
 
@@ -12,6 +15,15 @@ application {
   mainClass = "io.ktor.server.cio.EngineMain"
 
   applicationDefaultJvmArgs = listOf("-Dconfig.file=application-dev.yaml")
+}
+
+ktlint {
+  version.set("1.8.0")
+
+  reporters {
+    reporter(ReporterType.PLAIN)
+    reporter(ReporterType.HTML)
+  }
 }
 
 kotlin {

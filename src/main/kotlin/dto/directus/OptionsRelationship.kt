@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OptionsRelationship(
-    @SerialName("options_id")
-    val optionsID: Int
+  @SerialName("options_id")
+  val optionsID: Int,
 )

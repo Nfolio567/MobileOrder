@@ -6,8 +6,11 @@ import one.nfolio.dto.receive.UserLogin
 import java.time.LocalDate
 import java.time.ZoneId
 
-class MyVerifyService(private val directusService: DirectusService, private val lineOauthService: LineOauthService, environment: ApplicationEnvironment) {
-
+class MyVerifyService(
+  private val directusService: DirectusService,
+  private val lineOauthService: LineOauthService,
+  environment: ApplicationEnvironment,
+) {
   private val log = environment.log
 
   suspend fun baseLogin(res: UserLogin): String? {
@@ -36,7 +39,11 @@ class MyVerifyService(private val directusService: DirectusService, private val 
     return directusService.getLinePrimaryID(lineVerifyRes.sub) != null
   }
 
-  suspend fun verifyCart(cartID: Int?, userID: String, directus: DirectusService): Boolean { // そのカートが本当に本人のものなのか
+  suspend fun verifyCart(
+    cartID: Int?,
+    userID: String,
+    directus: DirectusService,
+  ): Boolean { // そのカートが本当に本人のものなのか
     val cart = directus.getCart(userID)
     return cart.data.any { it.id == cartID }
   }

@@ -1,0 +1,5 @@
+root = true
+
+[*.{kt,kts}]
+ij_kotlin_packages_to_use_import_on_demand = java.util.*,kotlin.test.*,one.nfolio.plugin.*,one.nfolio.dto.receive.*
+indent_size = 2

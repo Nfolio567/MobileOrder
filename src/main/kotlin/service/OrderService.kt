@@ -1,4 +1,3 @@
 package one.nfolio.service
 
-class OrderService {
-}
+class OrderService

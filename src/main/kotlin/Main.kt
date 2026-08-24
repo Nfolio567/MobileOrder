@@ -1,21 +1,15 @@
 package one.nfolio
 
-import io.ktor.server.application.*
-import one.nfolio.plugin.configureAuthentication
-import one.nfolio.plugin.configureHttp
-import one.nfolio.plugin.configureLogging
-import one.nfolio.plugin.configureSecurity
-import one.nfolio.plugin.configureSerialization
-import one.nfolio.plugin.configureSessions
-import one.nfolio.plugin.configureWebsockets
-import one.nfolio.service.LineOauthService
+import io.ktor.server.application.Application
+import one.nfolio.plugin.*
 import one.nfolio.service.DirectusService
+import one.nfolio.service.LineOauthService
 import one.nfolio.service.MyVerifyService
 import security.HMAC
-import kotlin.uuid.Uuid
 
 fun main(args: Array<String>) {
-  io.ktor.server.cio.EngineMain.main(args)
+  io.ktor.server.cio.EngineMain
+    .main(args)
 }
 
 fun Application.module() {
@@ -34,6 +28,6 @@ fun Application.module() {
   configureRouting(
     directus,
     HMAC(environment),
-    verifyService
+    verifyService,
   )
 }
