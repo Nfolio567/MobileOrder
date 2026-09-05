@@ -29,6 +29,7 @@ ktlint {
 kotlin {
   jvmToolchain(25)
 }
+
 dependencies {
   implementation(ktorLibs.serialization.kotlinx.json)
   implementation(ktorLibs.server.cio)
@@ -38,13 +39,15 @@ dependencies {
   implementation(ktorLibs.server.cors)
   implementation(ktorLibs.server.csrf)
   implementation(ktorLibs.server.websockets)
+  implementation(ktorLibs.server.auth)
+  implementation(ktorLibs.server.sessions)
+  implementation(ktorLibs.server.callLogging)
+  implementation(ktorLibs.client.core)
+  implementation(ktorLibs.client.cio)
+  implementation(ktorLibs.client.contentNegotiation)
+  implementation(ktorLibs.client.websockets)
   implementation(libs.logback.classic)
-  implementation(libs.ktor.client)
-  implementation(libs.ktor.client.cio)
-  implementation(libs.ktor.client.content.negotiation)
-  implementation("io.ktor:ktor-server-auth:3.5.0")
-  implementation("io.ktor:ktor-server-sessions:3.5.0")
-  implementation("io.ktor:ktor-server-call-logging:3.5.0")
+  implementation(libs.loki4j)
 
   testImplementation(kotlin("test"))
   testImplementation(ktorLibs.server.testHost)

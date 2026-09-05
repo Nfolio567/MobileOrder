@@ -1,5 +1,6 @@
 package one.nfolio
 
+import io.ktor.client.HttpClient
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.log
@@ -27,16 +28,16 @@ import one.nfolio.dto.response.MinimumProduct
 import one.nfolio.dto.response.QRResult
 import one.nfolio.dto.sessions.LineUserSession
 import one.nfolio.service.DirectusService
+import one.nfolio.service.KdsService
 import one.nfolio.service.MyVerifyService
 import security.HMAC
 import java.util.*
-
-val sessions = mutableSetOf<DefaultWebSocketServerSession>()
 
 fun Application.configureRouting(
   directus: DirectusService,
   hmac: HMAC,
   myVerifyService: MyVerifyService,
+  client: HttpClient,
 ) {
   routing {
     staticResources("/", "/static/public")
@@ -261,7 +262,6 @@ fun Application.configureRouting(
       tryPost("/webhook/payjp") {
       }
 
-
       // 以下staffゾーン
 
       tryGet("/staff") {
@@ -375,18 +375,15 @@ fun Application.configureRouting(
       tryGet("/kds") {
         call.respond(
           mapOf(
-            "orders" to directus.getOrder()
-          )
+            "orders" to directus.getOrder(),
+          ),
         )
       }
 
       webSocket("/kds-ws") {
-        sessions.add(this)
-        try {
-          awaitCancellation()
-        } finally {
-          sessions -= this
-        }
+        val kdsService = KdsService(client, environment, this)
+
+        kdsService.awaitDirectusSocket()
       }
     }
   }

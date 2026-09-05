@@ -15,7 +15,7 @@ import one.nfolio.service.DirectusService
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-fun Application.configureAuthentication(directus: DirectusService, generateHash: GenerateHash) {
+fun Application.configureAuthentication(directus: DirectusService) {
   install(Authentication) {
     session<LineUserSession>("line-user-session") {
       validate { session ->
@@ -32,7 +32,7 @@ fun Application.configureAuthentication(directus: DirectusService, generateHash:
     }
     bearer("kds-auth") {
       authenticate { credential ->
-        if (generateHash.sha256(credential.token) == directus.getKdsHashedToken()) {
+        if (GenerateHash.sha256(credential.token) == directus.getKdsHashedToken()) {
           UserIdPrincipal("kds")
         } else {
           null

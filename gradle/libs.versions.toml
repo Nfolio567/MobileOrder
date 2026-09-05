@@ -1,14 +1,12 @@
 [versions]
 kotlin = "2.4.10"
 logback = "1.5.34"
-ktor-client = "3.5.0"
 ktlint = "14.2.0"
+loki4j = "2.1.0"
 
 [libraries]
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-ktor-client = { module = "io.ktor:ktor-client-core", version.ref = "ktor-client" }
-ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor-client" }
-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor-client" }
+loki4j = { module = "com.github.loki4j:loki-logback-appender", version.ref = "loki4j" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

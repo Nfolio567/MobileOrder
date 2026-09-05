@@ -29,5 +29,6 @@ fun Application.module() {
     directus,
     HMAC(environment),
     verifyService,
+    client,
   )
 }

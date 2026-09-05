@@ -60,9 +60,8 @@ class DirectusService(
     return authorizableGet("$directusUrl/items/recommended").body<SingletonDirectus<RawRecommended>>().data.message
   }
 
-  suspend fun getOrder(): Directus<RawOrders> {
-    return authorizableGet("${directusUrl}/items/orders?fields=*,items.*,items.options.options_id.*,items.productID.*").body<Directus<RawOrders>>()
-  }
+  suspend fun getOrder(): Directus<RawOrders> =
+    authorizableGet("$directusUrl/items/orders?fields=*,items.*,items.options.options_id.*,items.productID.*").body<Directus<RawOrders>>()
 
   suspend fun registeringOrder(
     order: OrderRequest,
@@ -225,11 +224,12 @@ class DirectusService(
   }
 
   suspend fun getUserOrder(userID: String): List<RawOrders> =
-    authorizableGet("$directusUrl/items/orders?filter[userID][_eq]=$userID&fields=*,items.*,items.options.options_id.*,items.productID.*").body<Directus<RawOrders>>().data
+    authorizableGet(
+      "$directusUrl/items/orders?filter[userID][_eq]=$userID&fields=*,items.*,items.options.options_id.*,items.productID.*",
+    ).body<Directus<RawOrders>>().data
 
   suspend fun getKdsHashedToken(): String =
     authorizableGet("$directusUrl/items/kds_access_token").body<SingletonDirectus<RawKdsAccessToken>>().data.hashedToken
-
 
   // OrderItemsを登録するために、一旦ユーザーIDとFakeOrderIDをOrdersにinsertする。
   // 返ってきたOrderID, 生成したOrderFakeIDを返す

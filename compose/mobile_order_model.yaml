@@ -1,3 +1,5 @@
+name: mobile_order
+
 services:
   db:
     container_name: mobile-order-postgres-0
@@ -17,7 +19,7 @@ services:
     container_name: mobile-order-directus-0
     image: directus/directus:11.17.4
     env_file:
-      - /Users/kosei/Documents/IntelliJ/mobile_order/.env
+      - /Users/kosei/Documents/mobile_order/mobile_order_back/.env
     environment:
       DB_CLIENT: pg
       DB_HOST: db
@@ -27,8 +29,11 @@ services:
       DB_PASSWORD: 12345godislove
       SECRET: hf09wuy043h09hf0ih90h2bwe88g3g9wkudghv3ug83
       PUBLIC_URL: http://0.0.0.0:8055
+      WEBSOCKETS_ENABLED: true
     ports:
       - "8055:8055"
+    depends_on:
+      - db
 
 volumes:
   mobile-order-db:
