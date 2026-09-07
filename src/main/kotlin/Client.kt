@@ -16,7 +16,7 @@ fun configureClient(): HttpClient =
       json()
     }
     install(WebSockets) {
-      pingInterval = 15.seconds
+      //pingInterval = 15.seconds
       contentConverter = KotlinxWebsocketSerializationConverter(Json)
     }
   }

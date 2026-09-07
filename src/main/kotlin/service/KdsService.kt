@@ -3,15 +3,13 @@ package one.nfolio.service
 import dto.directus.RawOrders
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
-import io.ktor.client.plugins.websocket.receiveDeserialized
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.server.application.ApplicationEnvironment
 import io.ktor.server.websocket.DefaultWebSocketServerSession
-import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.Frame
+import io.ktor.websocket.readReason
 import io.ktor.websocket.readText
-import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.serialization.json.Json
 import one.nfolio.dto.directus.SubscriptionOrders
 
@@ -31,7 +29,7 @@ class KdsService(
           .toInt(),
       path = "/websocket",
     ) {
-      try {
+      //try {
 
         send(Frame.Text(
           """
@@ -44,19 +42,36 @@ class KdsService(
         environment.log.info("{}", environment.config.property("directus.access-token").getString())
 
         for (frame in incoming) {
-          if (frame !is Frame.Text) continue
-          environment.log.info("Frame: {}", frame.readText())
+          when (frame) {
+            is Frame.Text -> {
+              val rawText = frame.readText()
 
-          val message = receiveDeserialized<SubscriptionOrders>()
-          checkReceive(this, message)
+              val message = Json.decodeFromString<SubscriptionOrders>(rawText)
+              checkReceive(this, message)
+            }
+
+            is Frame.Close -> {
+              environment.log.info("Close: {}", frame.readReason())
+            }
+
+            is Frame.Ping -> {
+              environment.log.info("WebSocket Ping")
+            }
+
+            is Frame.Pong -> {
+              environment.log.info("WebSocket Pong")
+            }
+
+            is Frame.Binary -> {}
+          }
         }
-      } catch (e: ClosedReceiveChannelException) {
+      /*} catch (e: ClosedReceiveChannelException) {
         environment.log.info("WebSocket received channel closed")
         environment.log.info("Close Reason: ${closeReason.await()}")
         environment.log.info("WebSocket Closed: ", e)
       } catch (e: Exception) {
         environment.log.info("WebSocket Exception ", e)
-      }
+      }*/
     }
   }
 
@@ -69,6 +84,7 @@ class KdsService(
           }
 
           "create", "update" -> {
+            environment.log.info("Frame text: {}", message)
             sendOrderDiff(message.data)
           }
         }
@@ -95,6 +111,15 @@ class KdsService(
             )
           }
         }
+      }
+
+      "ping" -> {
+        environment.log.info("Directus ping")
+        session.send(Frame.Text(
+          """
+          {"type": "pong"}
+          """.trimIndent()
+        ))
       }
 
     }
