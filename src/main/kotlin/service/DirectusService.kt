@@ -77,7 +77,7 @@ class DirectusService(
             OptionsRelationship(optionID)
           }
 
-        authorizablePost("$directusUrl/items/order_items") {
+        authorizablePost("$directusUrl/items/order_items?fields=*,productID.*,options.options_id.*") {
           contentType(ContentType.Application.Json)
           setBody(
             OrderItemsRegister(
